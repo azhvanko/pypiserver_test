@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "pypiserver_test"
+version = "0.1.0"
+description = "pypiserver test"
+authors = ["Artsiom Zhvanko <azhvanko@outlook.com>"]
+readme = "README.md"
+packages = [
+    {include = "pypiserver_test"}
+]
+
+[tool.poetry.dependencies]
+python = ">=3.8"
+pypiserver = {version = "2.0.1", extras = ["passlib"]}
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,59 @@
+version: "3.9"
+
+services:
+  pypi:
+    build:
+      context: .
+    hostname: pypi
+    container_name: pypiserver_test_app
+    restart: always
+    networks:
+      - pypi
+    volumes:
+      - ./packages:/pypi/packages
+      - ./configs/htpasswd/all:/pypi/.htpasswd
+    command: [
+      "pypi-server",
+      "run",
+      "-p",
+      "8080",
+      "-a",
+      "download, list, update",
+      "-P",
+      "/pypi/.htpasswd",
+      "--log-stream",
+      "stdout",
+      "--disable-fallback",
+      "--overwrite",
+      "-vvv",
+      "/pypi/packages"
+    ]
+  nginx:
+    image: nginx:1.25.3-alpine
+    container_name: pypiserver_test_nginx
+    restart: always
+    ports:
+      - 80:80
+      - 443:443
+    networks:
+      - pypi
+    volumes:
+      - ./configs/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./configs/nginx/certificates/:/etc/nginx/ssl/
+      - ./configs/nginx/conf.d/:/etc/nginx/conf.d/
+      - ./configs/htpasswd/:/etc/nginx/htpasswd/
+    ulimits:
+      nofile:
+        hard: 2048
+        soft: 2048
+    depends_on:
+      - pypi
+
+networks:
+  pypi:
+    name: pypiserver_test
+    driver: bridge
+
+volumes:
+  pypi_packages:
+    name: pypiserver_test_packages
